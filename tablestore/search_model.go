@@ -244,7 +244,24 @@ type Analyzer string
 const (
 	Analyzer_SingleWord Analyzer = "single_word"
 	Analyzer_MaxWord    Analyzer = "max_word"
+	Analyzer_MinWord	Analyzer = "min_word"
+	Analyzer_Split		Analyzer = "split"
+	Analyzer_Fuzzy		Analyzer = "fuzzy"
 )
+
+type SingleWordAnalyzerParameter struct {
+	CaseSensitive	*bool
+}
+
+type SplitAnalyzerParameter struct {
+	Delimiter		*string
+}
+
+type FuzzyAnalyzerParameter struct {
+	Limit			*int32
+	MinChars		*int32
+	MaxChars		*int32
+}
 
 type FieldSchema struct {
 	FieldName        *string
@@ -252,6 +269,7 @@ type FieldSchema struct {
 	Index            *bool
 	IndexOptions     *IndexOptions
 	Analyzer         *Analyzer
+	AnalyzerParameter	interface{}
 	EnableSortAndAgg *bool
 	Store            *bool
 	IsArray          *bool
