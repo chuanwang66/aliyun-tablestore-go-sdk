@@ -106,6 +106,34 @@ func convertFieldSchemaToPBFieldSchema(fieldSchemas []*FieldSchema) []*otsprotoc
 		}
 		if value.Analyzer != nil {
 			field.Analyzer = proto.String(string(*value.Analyzer))
+
+			if value.AnalyzerParameter != nil {
+				if *value.Analyzer == Analyzer_SingleWord {
+					param := &otsprotocol.SingleWordAnalyzerParameter{
+						CaseSensitive:  proto.Bool(*value.AnalyzerParameter.(SingleWordAnalyzerParameter).CaseSensitive),
+					}
+					if paramBytes, err := proto.Marshal(param); err == nil {
+						field.AnalyzerParameter = paramBytes
+					}
+				} else if *value.Analyzer == Analyzer_Split {
+					param := &otsprotocol.SplitAnalyzerParameter {
+						Delimiter:  proto.String(*value.AnalyzerParameter.(SplitAnalyzerParameter).Delimiter),
+					}
+					if paramBytes, err := proto.Marshal(param); err == nil {
+						field.AnalyzerParameter = paramBytes
+					}
+				} else if *value.Analyzer == Analyzer_Fuzzy {
+					fuzzyParam := value.AnalyzerParameter.(FuzzyAnalyzerParameter)
+					param := &otsprotocol.FuzzyAnalyzerParameter {
+						Limit:  	proto.Int32(*fuzzyParam.Limit),
+						MaxChars:	proto.Int32(*fuzzyParam.MaxChars),
+						MinChars:	proto.Int32(*fuzzyParam.MinChars),
+					}
+					if paramBytes, err := proto.Marshal(param); err == nil {
+						field.AnalyzerParameter = paramBytes
+					}
+				}
+			}
 		}
 		if value.EnableSortAndAgg != nil {
 			field.DocValues = proto.Bool(*value.EnableSortAndAgg)
@@ -163,6 +191,30 @@ func parseFieldSchemaFromPb(pbFieldSchemas []*otsprotocol.FieldSchema) []*FieldS
 			field.IndexOptions = &indexOption
 		}
 		field.Analyzer = (*Analyzer)(value.Analyzer)
+		if *field.Analyzer == Analyzer_SingleWord {
+			param := new(otsprotocol.SingleWordAnalyzerParameter)
+			if err := proto.Unmarshal(value.AnalyzerParameter, param); err == nil {
+				field.AnalyzerParameter = SingleWordAnalyzerParameter {
+					CaseSensitive:	proto.Bool(*param.CaseSensitive),
+				}
+			}
+		} else if *field.Analyzer == Analyzer_Split {
+			param := new(otsprotocol.SplitAnalyzerParameter)
+			if err := proto.Unmarshal(value.AnalyzerParameter, param); err == nil {
+				field.AnalyzerParameter = SplitAnalyzerParameter {
+					Delimiter:	proto.String(*param.Delimiter),
+				}
+			}
+		} else if *field.Analyzer == Analyzer_Fuzzy {
+			param := new(otsprotocol.FuzzyAnalyzerParameter)
+			if err := proto.Unmarshal(value.AnalyzerParameter, param); err == nil {
+				field.AnalyzerParameter = FuzzyAnalyzerParameter {
+					Limit:		proto.Int32(*param.Limit),
+					MinChars:	proto.Int32(*param.MinChars),
+					MaxChars:	proto.Int32(*param.MaxChars),
+				}
+			}
+		}
 		field.EnableSortAndAgg = value.DocValues
 		field.Store = value.Store
 		field.IsArray = value.IsArray
