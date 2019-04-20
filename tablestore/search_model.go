@@ -3,7 +3,6 @@ package tablestore
 import (
 	"encoding/json"
 	"errors"
-
 	"github.com/aliyun/aliyun-tablestore-go-sdk/tablestore/otsprotocol"
 	"github.com/aliyun/aliyun-tablestore-go-sdk/tablestore/search"
 	"github.com/golang/protobuf/proto"
@@ -191,21 +190,21 @@ func parseFieldSchemaFromPb(pbFieldSchemas []*otsprotocol.FieldSchema) []*FieldS
 			field.IndexOptions = &indexOption
 		}
 		field.Analyzer = (*Analyzer)(value.Analyzer)
-		if *field.Analyzer == Analyzer_SingleWord {
+		if field.Analyzer != nil && *field.Analyzer == Analyzer_SingleWord && value.AnalyzerParameter != nil {
 			param := new(otsprotocol.SingleWordAnalyzerParameter)
 			if err := proto.Unmarshal(value.AnalyzerParameter, param); err == nil {
 				field.AnalyzerParameter = SingleWordAnalyzerParameter {
 					CaseSensitive:	proto.Bool(*param.CaseSensitive),
 				}
 			}
-		} else if *field.Analyzer == Analyzer_Split {
+		} else if field.Analyzer != nil && *field.Analyzer == Analyzer_Split && value.AnalyzerParameter != nil {
 			param := new(otsprotocol.SplitAnalyzerParameter)
 			if err := proto.Unmarshal(value.AnalyzerParameter, param); err == nil {
 				field.AnalyzerParameter = SplitAnalyzerParameter {
 					Delimiter:	proto.String(*param.Delimiter),
 				}
 			}
-		} else if *field.Analyzer == Analyzer_Fuzzy {
+		} else if field.Analyzer != nil && *field.Analyzer == Analyzer_Fuzzy && value.AnalyzerParameter != nil {
 			param := new(otsprotocol.FuzzyAnalyzerParameter)
 			if err := proto.Unmarshal(value.AnalyzerParameter, param); err == nil {
 				field.AnalyzerParameter = FuzzyAnalyzerParameter {
