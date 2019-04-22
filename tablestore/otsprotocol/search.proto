@@ -245,6 +245,7 @@ enum FieldType {
 
 message SingleWordAnalyzerParameter {
     optional bool case_sensitive = 1;
+    optional bool delimit_word = 2;
 }
 
 message SplitAnalyzerParameter {
@@ -252,9 +253,8 @@ message SplitAnalyzerParameter {
 }
 
 message FuzzyAnalyzerParameter {
-    optional int32 limit = 1;     //text字符最大长度，超过则被char filter截断
-    optional int32 min_chars = 2;
-    optional int32 max_chars = 3;
+    optional int32 min_chars = 1;
+    optional int32 max_chars = 2;
 }
 
 message FieldSchema {

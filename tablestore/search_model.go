@@ -110,6 +110,7 @@ func convertFieldSchemaToPBFieldSchema(fieldSchemas []*FieldSchema) []*otsprotoc
 				if *value.Analyzer == Analyzer_SingleWord {
 					param := &otsprotocol.SingleWordAnalyzerParameter{
 						CaseSensitive:  proto.Bool(*value.AnalyzerParameter.(SingleWordAnalyzerParameter).CaseSensitive),
+						DelimitWord:	proto.Bool(*value.AnalyzerParameter.(SingleWordAnalyzerParameter).DelimitWord),
 					}
 					if paramBytes, err := proto.Marshal(param); err == nil {
 						field.AnalyzerParameter = paramBytes
@@ -124,7 +125,6 @@ func convertFieldSchemaToPBFieldSchema(fieldSchemas []*FieldSchema) []*otsprotoc
 				} else if *value.Analyzer == Analyzer_Fuzzy {
 					fuzzyParam := value.AnalyzerParameter.(FuzzyAnalyzerParameter)
 					param := &otsprotocol.FuzzyAnalyzerParameter {
-						Limit:  	proto.Int32(*fuzzyParam.Limit),
 						MaxChars:	proto.Int32(*fuzzyParam.MaxChars),
 						MinChars:	proto.Int32(*fuzzyParam.MinChars),
 					}
@@ -192,23 +192,23 @@ func parseFieldSchemaFromPb(pbFieldSchemas []*otsprotocol.FieldSchema) []*FieldS
 		field.Analyzer = (*Analyzer)(value.Analyzer)
 		if field.Analyzer != nil && *field.Analyzer == Analyzer_SingleWord && value.AnalyzerParameter != nil {
 			param := new(otsprotocol.SingleWordAnalyzerParameter)
-			if err := proto.Unmarshal(value.AnalyzerParameter, param); err == nil {
+			if err := proto.Unmarshal(value.AnalyzerParameter, param); err == nil && param != nil {
 				field.AnalyzerParameter = SingleWordAnalyzerParameter {
 					CaseSensitive:	proto.Bool(*param.CaseSensitive),
+					DelimitWord:	proto.Bool(*param.DelimitWord),
 				}
 			}
 		} else if field.Analyzer != nil && *field.Analyzer == Analyzer_Split && value.AnalyzerParameter != nil {
 			param := new(otsprotocol.SplitAnalyzerParameter)
-			if err := proto.Unmarshal(value.AnalyzerParameter, param); err == nil {
+			if err := proto.Unmarshal(value.AnalyzerParameter, param); err == nil && param != nil {
 				field.AnalyzerParameter = SplitAnalyzerParameter {
 					Delimiter:	proto.String(*param.Delimiter),
 				}
 			}
 		} else if field.Analyzer != nil && *field.Analyzer == Analyzer_Fuzzy && value.AnalyzerParameter != nil {
 			param := new(otsprotocol.FuzzyAnalyzerParameter)
-			if err := proto.Unmarshal(value.AnalyzerParameter, param); err == nil {
+			if err := proto.Unmarshal(value.AnalyzerParameter, param); err == nil && param != nil {
 				field.AnalyzerParameter = FuzzyAnalyzerParameter {
-					Limit:		proto.Int32(*param.Limit),
 					MinChars:	proto.Int32(*param.MinChars),
 					MaxChars:	proto.Int32(*param.MaxChars),
 				}
@@ -302,6 +302,7 @@ const (
 
 type SingleWordAnalyzerParameter struct {
 	CaseSensitive	*bool
+	DelimitWord		*bool
 }
 
 type SplitAnalyzerParameter struct {
@@ -309,7 +310,6 @@ type SplitAnalyzerParameter struct {
 }
 
 type FuzzyAnalyzerParameter struct {
-	Limit			*int32
 	MinChars		*int32
 	MaxChars		*int32
 }

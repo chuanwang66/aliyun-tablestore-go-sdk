@@ -11,7 +11,10 @@ import (
 
 func TestConvertFieldSchemaToPBFieldSchema_SingleWord(t *testing.T) {
 	analyzer := Analyzer_SingleWord
-	analyzerParam := SingleWordAnalyzerParameter{CaseSensitive:proto.Bool(true)}
+	analyzerParam := SingleWordAnalyzerParameter{
+		CaseSensitive:	proto.Bool(true),
+		DelimitWord:	proto.Bool(true),
+	}
 	schemas := []*FieldSchema{
 		{
 			FieldName:			proto.String("Col_Analyzer"),
@@ -28,6 +31,7 @@ func TestConvertFieldSchemaToPBFieldSchema_SingleWord(t *testing.T) {
 	// expect result
 	pbAnalyzerParamExpected := &otsprotocol.SingleWordAnalyzerParameter{
 		CaseSensitive:	proto.Bool(true),
+		DelimitWord:	proto.Bool(true),
 	}
 	bytesAnalyzerParamExpected, _ := proto.Marshal(pbAnalyzerParamExpected)
 
@@ -88,7 +92,6 @@ func TestConvertFieldSchemaToPBFieldSchema_Split(t *testing.T) {
 func TestConvertFieldSchemaToPBFieldSchema_Fuzzy(t *testing.T) {
 	analyzer := Analyzer_Fuzzy
 	analyzerParam := FuzzyAnalyzerParameter{
-		Limit:		proto.Int32(10),
 		MinChars:	proto.Int32(2),
 		MaxChars:	proto.Int32(3),
 	}
@@ -107,7 +110,6 @@ func TestConvertFieldSchemaToPBFieldSchema_Fuzzy(t *testing.T) {
 
 	// expect result
 	pbAnalyzerParamExpected := &otsprotocol.FuzzyAnalyzerParameter{
-		Limit:		proto.Int32(10),
 		MinChars:	proto.Int32(2),
 		MaxChars:	proto.Int32(3),
 	}
@@ -257,6 +259,7 @@ func TestParseFieldSchemaFromPb_SingleWord(t *testing.T) {
 	// build pb
 	pbParam := new(otsprotocol.SingleWordAnalyzerParameter)
 	pbParam.CaseSensitive = proto.Bool(true)
+	pbParam.DelimitWord   = proto.Bool(true)
 	pbParamBytes, _:= proto.Marshal(pbParam)
 
 	pbFieldSchema := new(otsprotocol.FieldSchema)
@@ -314,7 +317,6 @@ func TestParseFieldSchemaFromPb_Split(t *testing.T) {
 func TestParseFieldSchemaFromPb_Fuzzy(t *testing.T) {
 	// build pb
 	pbParam := new(otsprotocol.FuzzyAnalyzerParameter)
-	pbParam.Limit = proto.Int32(10)
 	pbParam.MinChars = proto.Int32(2)
 	pbParam.MaxChars = proto.Int32(3)
 	pbParamBytes, _:= proto.Marshal(pbParam)
@@ -339,7 +341,6 @@ func TestParseFieldSchemaFromPb_Fuzzy(t *testing.T) {
 	analyzerExpected := Analyzer_Fuzzy
 	assert.Equal(t, analyzerExpected, *fieldSchemas[0].Analyzer)
 
-	assert.Equal(t, int32(10), *(fieldSchemas[0].AnalyzerParameter).(FuzzyAnalyzerParameter).Limit)
 	assert.Equal(t, int32(2), *(fieldSchemas[0].AnalyzerParameter).(FuzzyAnalyzerParameter).MinChars)
 	assert.Equal(t, int32(3), *(fieldSchemas[0].AnalyzerParameter).(FuzzyAnalyzerParameter).MaxChars)
 }
@@ -514,7 +515,6 @@ func TestParseFieldSchemaFromPb_NoAnalyzerWithParam2(t *testing.T) {
 func TestParseFieldSchemaFromPb_NoAnalyzerWithParam3(t *testing.T) {
 	// build pb
 	pbParam := new(otsprotocol.FuzzyAnalyzerParameter)
-	pbParam.Limit = proto.Int32(10)
 	pbParam.MinChars = proto.Int32(2)
 	pbParam.MaxChars = proto.Int32(3)
 	pbParamBytes, _:= proto.Marshal(pbParam)

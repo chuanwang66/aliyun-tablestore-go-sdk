@@ -728,7 +728,10 @@ func Analysis(client *tablestore.TableStoreClient, tableName string, indexName s
 	schemas := []*tablestore.FieldSchema{}
 
 	analyzer1 := tablestore.Analyzer_SingleWord
-	analyzerParam1 := tablestore.SingleWordAnalyzerParameter{CaseSensitive:proto.Bool(true)}
+	analyzerParam1 := tablestore.SingleWordAnalyzerParameter{
+		CaseSensitive:	proto.Bool(true),
+		DelimitWord:	proto.Bool(true),
+	}
 	field1 := &tablestore.FieldSchema{
 		FieldName:        proto.String("Col_SingleWord"),  // 设置字段名，使用proto.String用于获取字符串指针
 		FieldType:        tablestore.FieldType_TEXT,       // 设置字段类型
@@ -765,7 +768,6 @@ func Analysis(client *tablestore.TableStoreClient, tableName string, indexName s
 
 	analyzer5 := tablestore.Analyzer_Fuzzy
 	analyzerParam5 := tablestore.FuzzyAnalyzerParameter{
-		Limit:            proto.Int32(10),
 		MinChars:         proto.Int32(1),
 		MaxChars:         proto.Int32(4),
 	}
