@@ -51,6 +51,86 @@ func TestConvertFieldSchemaToPBFieldSchema_SingleWord(t *testing.T) {
 	assert.Equal(t, pbSchemaExpected.AnalyzerParameter, pbSchemas[0].AnalyzerParameter)
 }
 
+func TestConvertFieldSchemaToPBFieldSchema_SingleWord_NoDelimitWord(t *testing.T) {
+	analyzer := Analyzer_SingleWord
+	analyzerParam := SingleWordAnalyzerParameter{
+		CaseSensitive:	proto.Bool(true),
+	}
+	schemas := []*FieldSchema{
+		{
+			FieldName:			proto.String("Col_Analyzer"),
+			FieldType:			FieldType_TEXT,
+			Analyzer:			&analyzer,
+			AnalyzerParameter:	analyzerParam,
+		},
+	}
+
+	// convert to pb
+	var pbSchemas []*otsprotocol.FieldSchema
+	pbSchemas = convertFieldSchemaToPBFieldSchema(schemas)
+
+	// expect result
+	pbAnalyzerParamExpected := &otsprotocol.SingleWordAnalyzerParameter{
+		CaseSensitive:	proto.Bool(true),
+	}
+	bytesAnalyzerParamExpected, _ := proto.Marshal(pbAnalyzerParamExpected)
+
+	pbSchemaExpected := new(otsprotocol.FieldSchema)
+	pbSchemaExpected.FieldName = proto.String("Col_Analyzer")
+	pbSchemaExpected.FieldType = otsprotocol.FieldType_TEXT.Enum()
+	pbSchemaExpected.Analyzer = proto.String("single_word")
+	pbSchemaExpected.AnalyzerParameter = bytesAnalyzerParamExpected
+
+	// assert
+	t.Log("pb actural ==> ", pbSchemas)
+	assert.Equal(t, len(pbSchemas), 1)
+
+	assert.Equal(t, *pbSchemaExpected.FieldName, *pbSchemas[0].FieldName)
+	assert.Equal(t, *pbSchemaExpected.FieldType, *pbSchemas[0].FieldType)
+	assert.Equal(t, *pbSchemaExpected.Analyzer, *pbSchemas[0].Analyzer)
+	assert.Equal(t, pbSchemaExpected.AnalyzerParameter, pbSchemas[0].AnalyzerParameter)
+}
+
+func TestConvertFieldSchemaToPBFieldSchema_SingleWord_NoCaseSensitive(t *testing.T) {
+	analyzer := Analyzer_SingleWord
+	analyzerParam := SingleWordAnalyzerParameter{
+		DelimitWord:	proto.Bool(true),
+	}
+	schemas := []*FieldSchema{
+		{
+			FieldName:			proto.String("Col_Analyzer"),
+			FieldType:			FieldType_TEXT,
+			Analyzer:			&analyzer,
+			AnalyzerParameter:	analyzerParam,
+		},
+	}
+
+	// convert to pb
+	var pbSchemas []*otsprotocol.FieldSchema
+	pbSchemas = convertFieldSchemaToPBFieldSchema(schemas)
+
+	// expect result
+	pbAnalyzerParamExpected := &otsprotocol.SingleWordAnalyzerParameter{
+		DelimitWord:	proto.Bool(true),
+	}
+	bytesAnalyzerParamExpected, _ := proto.Marshal(pbAnalyzerParamExpected)
+
+	pbSchemaExpected := new(otsprotocol.FieldSchema)
+	pbSchemaExpected.FieldName = proto.String("Col_Analyzer")
+	pbSchemaExpected.FieldType = otsprotocol.FieldType_TEXT.Enum()
+	pbSchemaExpected.Analyzer = proto.String("single_word")
+	pbSchemaExpected.AnalyzerParameter = bytesAnalyzerParamExpected
+
+	// assert
+	t.Log("pb actural ==> ", pbSchemas)
+	assert.Equal(t, len(pbSchemas), 1)
+
+	assert.Equal(t, *pbSchemaExpected.FieldName, *pbSchemas[0].FieldName)
+	assert.Equal(t, *pbSchemaExpected.FieldType, *pbSchemas[0].FieldType)
+	assert.Equal(t, *pbSchemaExpected.Analyzer, *pbSchemas[0].Analyzer)
+	assert.Equal(t, pbSchemaExpected.AnalyzerParameter, pbSchemas[0].AnalyzerParameter)
+}
+
 func TestConvertFieldSchemaToPBFieldSchema_Split(t *testing.T) {
 	analyzer := Analyzer_Split
 	analyzerParam := SplitAnalyzerParameter{Delimiter:proto.String("-")}
@@ -71,6 +151,42 @@ func TestConvertFieldSchemaToPBFieldSchema_Split(t *testing.T) {
 	pbAnalyzerParamExpected := &otsprotocol.SplitAnalyzerParameter{
 		Delimiter:	proto.String("-"),
 	}
+	bytesAnalyzerParamExpected, _ := proto.Marshal(pbAnalyzerParamExpected)
+
+	pbSchemaExpected := new(otsprotocol.FieldSchema)
+	pbSchemaExpected.FieldName = proto.String("Col_Analyzer")
+	pbSchemaExpected.FieldType = otsprotocol.FieldType_TEXT.Enum()
+	pbSchemaExpected.Analyzer = proto.String("split")
+	pbSchemaExpected.AnalyzerParameter = bytesAnalyzerParamExpected
+
+	// assert
+	t.Log("pb actural ==> ", pbSchemas)
+	assert.Equal(t, len(pbSchemas), 1)
+
+	assert.Equal(t, *pbSchemaExpected.FieldName, *pbSchemas[0].FieldName)
+	assert.Equal(t, *pbSchemaExpected.FieldType, *pbSchemas[0].FieldType)
+	assert.Equal(t, *pbSchemaExpected.Analyzer, *pbSchemas[0].Analyzer)
+	assert.Equal(t, pbSchemaExpected.AnalyzerParameter, pbSchemas[0].AnalyzerParameter)
+}
+
+func TestConvertFieldSchemaToPBFieldSchema_Split_NoDelimiter(t *testing.T) {
+	analyzer := Analyzer_Split
+	analyzerParam := SplitAnalyzerParameter{}
+	schemas := []*FieldSchema{
+		{
+			FieldName:			proto.String("Col_Analyzer"),
+			FieldType:			FieldType_TEXT,
+			Analyzer:			&analyzer,
+			AnalyzerParameter:	analyzerParam,
+		},
+	}
+
+	// convert to pb
+	var pbSchemas []*otsprotocol.FieldSchema
+	pbSchemas = convertFieldSchemaToPBFieldSchema(schemas)
+
+	// expect result
+	pbAnalyzerParamExpected := &otsprotocol.SplitAnalyzerParameter{}
 	bytesAnalyzerParamExpected, _ := proto.Marshal(pbAnalyzerParamExpected)
 
 	pbSchemaExpected := new(otsprotocol.FieldSchema)
@@ -131,6 +247,85 @@ func TestConvertFieldSchemaToPBFieldSchema_Fuzzy(t *testing.T) {
 	assert.Equal(t, pbSchemaExpected.AnalyzerParameter, pbSchemas[0].AnalyzerParameter)
 }
 
+func TestConvertFieldSchemaToPBFieldSchema_Fuzzy_NoMinChars(t *testing.T) {
+	analyzer := Analyzer_Fuzzy
+	analyzerParam := FuzzyAnalyzerParameter{
+		MaxChars:	proto.Int32(3),
+	}
+	schemas := []*FieldSchema{
+		{
+			FieldName:			proto.String("Col_Analyzer"),
+			FieldType:			FieldType_TEXT,
+			Analyzer:			&analyzer,
+			AnalyzerParameter:	analyzerParam,
+		},
+	}
+
+	// convert to pb
+	var pbSchemas []*otsprotocol.FieldSchema
+	pbSchemas = convertFieldSchemaToPBFieldSchema(schemas)
+
+	// expect result
+	pbAnalyzerParamExpected := &otsprotocol.FuzzyAnalyzerParameter{
+		MaxChars:	proto.Int32(3),
+	}
+	bytesAnalyzerParamExpected, _ := proto.Marshal(pbAnalyzerParamExpected)
+
+	pbSchemaExpected := new(otsprotocol.FieldSchema)
+	pbSchemaExpected.FieldName = proto.String("Col_Analyzer")
+	pbSchemaExpected.FieldType = otsprotocol.FieldType_TEXT.Enum()
+	pbSchemaExpected.Analyzer = proto.String("fuzzy")
+	pbSchemaExpected.AnalyzerParameter = bytesAnalyzerParamExpected
+
+	// assert
+	t.Log("pb actural ==> ", pbSchemas)
+	assert.Equal(t, len(pbSchemas), 1)
+
+	assert.Equal(t, *pbSchemaExpected.FieldName, *pbSchemas[0].FieldName)
+	assert.Equal(t, *pbSchemaExpected.FieldType, *pbSchemas[0].FieldType)
+	assert.Equal(t, *pbSchemaExpected.Analyzer, *pbSchemas[0].Analyzer)
+	assert.Equal(t, pbSchemaExpected.AnalyzerParameter, pbSchemas[0].AnalyzerParameter)
+}
+
+func TestConvertFieldSchemaToPBFieldSchema_Fuzzy_NoMaxChars(t *testing.T) {
+	analyzer := Analyzer_Fuzzy
+	analyzerParam := FuzzyAnalyzerParameter{
+		MaxChars:	proto.Int32(3),
+	}
+	schemas := []*FieldSchema{
+		{
+			FieldName:			proto.String("Col_Analyzer"),
+			FieldType:			FieldType_TEXT,
+			Analyzer:			&analyzer,
+			AnalyzerParameter:	analyzerParam,
+		},
+	}
+
+	// convert to pb
+	var pbSchemas []*otsprotocol.FieldSchema
+	pbSchemas = convertFieldSchemaToPBFieldSchema(schemas)
+
+	// expect result
+	pbAnalyzerParamExpected := &otsprotocol.FuzzyAnalyzerParameter{
+		MaxChars:	proto.Int32(3),
+	}
+	bytesAnalyzerParamExpected, _ := proto.Marshal(pbAnalyzerParamExpected)
+
+	pbSchemaExpected := new(otsprotocol.FieldSchema)
+	pbSchemaExpected.FieldName = proto.String("Col_Analyzer")
+	pbSchemaExpected.FieldType = otsprotocol.FieldType_TEXT.Enum()
+	pbSchemaExpected.Analyzer = proto.String("fuzzy")
+	pbSchemaExpected.AnalyzerParameter = bytesAnalyzerParamExpected
+
+	// assert
+	t.Log("pb actural ==> ", pbSchemas)
+	assert.Equal(t, len(pbSchemas), 1)
+
+	assert.Equal(t, *pbSchemaExpected.FieldName, *pbSchemas[0].FieldName)
+	assert.Equal(t, *pbSchemaExpected.FieldType, *pbSchemas[0].FieldType)
+	assert.Equal(t, *pbSchemaExpected.Analyzer, *pbSchemas[0].Analyzer)
+	assert.Equal(t, pbSchemaExpected.AnalyzerParameter, pbSchemas[0].AnalyzerParameter)
+}
 
 func TestConvertFieldSchemaToPBFieldSchema_MinWord(t *testing.T) {
 	analyzer := Analyzer_MinWord
@@ -285,6 +480,66 @@ func TestParseFieldSchemaFromPb_SingleWord(t *testing.T) {
 	assert.Equal(t, true, *(fieldSchemas[0].AnalyzerParameter).(SingleWordAnalyzerParameter).CaseSensitive)
 }
 
+func TestParseFieldSchemaFromPb_SingleWord_NoDelimitWord(t *testing.T) {
+	// build pb
+	pbParam := new(otsprotocol.SingleWordAnalyzerParameter)
+	pbParam.CaseSensitive = proto.Bool(true)
+	pbParamBytes, _:= proto.Marshal(pbParam)
+
+	pbFieldSchema := new(otsprotocol.FieldSchema)
+	pbFieldSchema.FieldName = proto.String("Col_Analyzer")
+	pbFieldSchema.FieldType = otsprotocol.FieldType_TEXT.Enum()
+	pbFieldSchema.Analyzer = proto.String("single_word")
+	pbFieldSchema.AnalyzerParameter = pbParamBytes
+
+	pbFieldSchemas := []*otsprotocol.FieldSchema {
+		pbFieldSchema,
+	}
+
+	// pb -> model
+	fieldSchemas := parseFieldSchemaFromPb(pbFieldSchemas)
+
+	// assert
+	t.Log("fieldSchemas ==> ", fieldSchemas)
+	assert.Equal(t, len(fieldSchemas), 1)
+
+	analyzerExpected := Analyzer_SingleWord
+	assert.Equal(t, analyzerExpected, *fieldSchemas[0].Analyzer)
+
+	assert.Equal(t, true, *(fieldSchemas[0].AnalyzerParameter).(SingleWordAnalyzerParameter).CaseSensitive)
+	assert.Nil(t, (fieldSchemas[0].AnalyzerParameter).(SingleWordAnalyzerParameter).DelimitWord)
+}
+
+func TestParseFieldSchemaFromPb_SingleWord_NoCaseSensitive(t *testing.T) {
+	// build pb
+	pbParam := new(otsprotocol.SingleWordAnalyzerParameter)
+	pbParam.DelimitWord = proto.Bool(true)
+	pbParamBytes, _:= proto.Marshal(pbParam)
+
+	pbFieldSchema := new(otsprotocol.FieldSchema)
+	pbFieldSchema.FieldName = proto.String("Col_Analyzer")
+	pbFieldSchema.FieldType = otsprotocol.FieldType_TEXT.Enum()
+	pbFieldSchema.Analyzer = proto.String("single_word")
+	pbFieldSchema.AnalyzerParameter = pbParamBytes
+
+	pbFieldSchemas := []*otsprotocol.FieldSchema {
+		pbFieldSchema,
+	}
+
+	// pb -> model
+	fieldSchemas := parseFieldSchemaFromPb(pbFieldSchemas)
+
+	// assert
+	t.Log("fieldSchemas ==> ", fieldSchemas)
+	assert.Equal(t, len(fieldSchemas), 1)
+
+	analyzerExpected := Analyzer_SingleWord
+	assert.Equal(t, analyzerExpected, *fieldSchemas[0].Analyzer)
+
+	assert.Nil(t, (fieldSchemas[0].AnalyzerParameter).(SingleWordAnalyzerParameter).CaseSensitive)
+	assert.Equal(t, true, *(fieldSchemas[0].AnalyzerParameter).(SingleWordAnalyzerParameter).DelimitWord)
+}
+
 func TestParseFieldSchemaFromPb_Split(t *testing.T) {
 	// build pb
 	pbParam := new(otsprotocol.SplitAnalyzerParameter)
@@ -312,6 +567,34 @@ func TestParseFieldSchemaFromPb_Split(t *testing.T) {
 	assert.Equal(t, analyzerExpected, *fieldSchemas[0].Analyzer)
 
 	assert.Equal(t, "-", *(fieldSchemas[0].AnalyzerParameter).(SplitAnalyzerParameter).Delimiter)
+}
+
+func TestParseFieldSchemaFromPb_Split_NoDelimiter(t *testing.T) {
+	// build pb
+	pbParam := new(otsprotocol.SplitAnalyzerParameter)
+	pbParamBytes, _:= proto.Marshal(pbParam)
+
+	pbFieldSchema := new(otsprotocol.FieldSchema)
+	pbFieldSchema.FieldName = proto.String("Col_Analyzer")
+	pbFieldSchema.FieldType = otsprotocol.FieldType_TEXT.Enum()
+	pbFieldSchema.Analyzer = proto.String("split")
+	pbFieldSchema.AnalyzerParameter = pbParamBytes
+
+	pbFieldSchemas := []*otsprotocol.FieldSchema {
+		pbFieldSchema,
+	}
+
+	// pb -> model
+	fieldSchemas := parseFieldSchemaFromPb(pbFieldSchemas)
+
+	// assert
+	t.Log("fieldSchemas ==> ", fieldSchemas)
+	assert.Equal(t, len(fieldSchemas), 1)
+
+	analyzerExpected := Analyzer_Split
+	assert.Equal(t, analyzerExpected, *fieldSchemas[0].Analyzer)
+
+	assert.Nil(t, (fieldSchemas[0].AnalyzerParameter).(SplitAnalyzerParameter).Delimiter)
 }
 
 func TestParseFieldSchemaFromPb_Fuzzy(t *testing.T) {
@@ -343,6 +626,66 @@ func TestParseFieldSchemaFromPb_Fuzzy(t *testing.T) {
 
 	assert.Equal(t, int32(2), *(fieldSchemas[0].AnalyzerParameter).(FuzzyAnalyzerParameter).MinChars)
 	assert.Equal(t, int32(3), *(fieldSchemas[0].AnalyzerParameter).(FuzzyAnalyzerParameter).MaxChars)
+}
+
+func TestParseFieldSchemaFromPb_Fuzzy_NoMinChars(t *testing.T) {
+	// build pb
+	pbParam := new(otsprotocol.FuzzyAnalyzerParameter)
+	pbParam.MaxChars = proto.Int32(3)
+	pbParamBytes, _:= proto.Marshal(pbParam)
+
+	pbFieldSchema := new(otsprotocol.FieldSchema)
+	pbFieldSchema.FieldName = proto.String("Col_Analyzer")
+	pbFieldSchema.FieldType = otsprotocol.FieldType_TEXT.Enum()
+	pbFieldSchema.Analyzer = proto.String("fuzzy")
+	pbFieldSchema.AnalyzerParameter = pbParamBytes
+
+	pbFieldSchemas := []*otsprotocol.FieldSchema {
+		pbFieldSchema,
+	}
+
+	// pb -> model
+	fieldSchemas := parseFieldSchemaFromPb(pbFieldSchemas)
+
+	// assert
+	t.Log("fieldSchemas ==> ", fieldSchemas)
+	assert.Equal(t, len(fieldSchemas), 1)
+
+	analyzerExpected := Analyzer_Fuzzy
+	assert.Equal(t, analyzerExpected, *fieldSchemas[0].Analyzer)
+
+	assert.Nil(t, (fieldSchemas[0].AnalyzerParameter).(FuzzyAnalyzerParameter).MinChars)
+	assert.Equal(t, int32(3), *(fieldSchemas[0].AnalyzerParameter).(FuzzyAnalyzerParameter).MaxChars)
+}
+
+func TestParseFieldSchemaFromPb_Fuzzy_NoMaxChars(t *testing.T) {
+	// build pb
+	pbParam := new(otsprotocol.FuzzyAnalyzerParameter)
+	pbParam.MinChars = proto.Int32(2)
+	pbParamBytes, _:= proto.Marshal(pbParam)
+
+	pbFieldSchema := new(otsprotocol.FieldSchema)
+	pbFieldSchema.FieldName = proto.String("Col_Analyzer")
+	pbFieldSchema.FieldType = otsprotocol.FieldType_TEXT.Enum()
+	pbFieldSchema.Analyzer = proto.String("fuzzy")
+	pbFieldSchema.AnalyzerParameter = pbParamBytes
+
+	pbFieldSchemas := []*otsprotocol.FieldSchema {
+		pbFieldSchema,
+	}
+
+	// pb -> model
+	fieldSchemas := parseFieldSchemaFromPb(pbFieldSchemas)
+
+	// assert
+	t.Log("fieldSchemas ==> ", fieldSchemas)
+	assert.Equal(t, len(fieldSchemas), 1)
+
+	analyzerExpected := Analyzer_Fuzzy
+	assert.Equal(t, analyzerExpected, *fieldSchemas[0].Analyzer)
+
+	assert.Equal(t, int32(2), *(fieldSchemas[0].AnalyzerParameter).(FuzzyAnalyzerParameter).MinChars)
+	assert.Nil(t, (fieldSchemas[0].AnalyzerParameter).(FuzzyAnalyzerParameter).MaxChars)
 }
 
 func TestParseFieldSchemaFromPb_MinWord(t *testing.T) {

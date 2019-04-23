@@ -108,25 +108,32 @@ func convertFieldSchemaToPBFieldSchema(fieldSchemas []*FieldSchema) []*otsprotoc
 
 			if value.AnalyzerParameter != nil {
 				if *value.Analyzer == Analyzer_SingleWord {
-					param := &otsprotocol.SingleWordAnalyzerParameter{
-						CaseSensitive:  proto.Bool(*value.AnalyzerParameter.(SingleWordAnalyzerParameter).CaseSensitive),
-						DelimitWord:	proto.Bool(*value.AnalyzerParameter.(SingleWordAnalyzerParameter).DelimitWord),
+					param := &otsprotocol.SingleWordAnalyzerParameter{}
+					if value.AnalyzerParameter.(SingleWordAnalyzerParameter).CaseSensitive != nil {
+						param.CaseSensitive = proto.Bool(*value.AnalyzerParameter.(SingleWordAnalyzerParameter).CaseSensitive)
+					}
+					if value.AnalyzerParameter.(SingleWordAnalyzerParameter).DelimitWord != nil {
+						param.DelimitWord = proto.Bool(*value.AnalyzerParameter.(SingleWordAnalyzerParameter).DelimitWord)
 					}
 					if paramBytes, err := proto.Marshal(param); err == nil {
 						field.AnalyzerParameter = paramBytes
 					}
 				} else if *value.Analyzer == Analyzer_Split {
-					param := &otsprotocol.SplitAnalyzerParameter {
-						Delimiter:  proto.String(*value.AnalyzerParameter.(SplitAnalyzerParameter).Delimiter),
+					param := &otsprotocol.SplitAnalyzerParameter {}
+					if value.AnalyzerParameter.(SplitAnalyzerParameter).Delimiter != nil {
+						param.Delimiter = proto.String(*value.AnalyzerParameter.(SplitAnalyzerParameter).Delimiter)
 					}
 					if paramBytes, err := proto.Marshal(param); err == nil {
 						field.AnalyzerParameter = paramBytes
 					}
 				} else if *value.Analyzer == Analyzer_Fuzzy {
 					fuzzyParam := value.AnalyzerParameter.(FuzzyAnalyzerParameter)
-					param := &otsprotocol.FuzzyAnalyzerParameter {
-						MaxChars:	proto.Int32(*fuzzyParam.MaxChars),
-						MinChars:	proto.Int32(*fuzzyParam.MinChars),
+					param := &otsprotocol.FuzzyAnalyzerParameter {}
+					if fuzzyParam.MaxChars != nil {
+						param.MaxChars = proto.Int32(*fuzzyParam.MaxChars)
+					}
+					if fuzzyParam.MinChars != nil {
+						param.MinChars = proto.Int32(*fuzzyParam.MinChars)
 					}
 					if paramBytes, err := proto.Marshal(param); err == nil {
 						field.AnalyzerParameter = paramBytes
@@ -193,25 +200,35 @@ func parseFieldSchemaFromPb(pbFieldSchemas []*otsprotocol.FieldSchema) []*FieldS
 		if field.Analyzer != nil && *field.Analyzer == Analyzer_SingleWord && value.AnalyzerParameter != nil {
 			param := new(otsprotocol.SingleWordAnalyzerParameter)
 			if err := proto.Unmarshal(value.AnalyzerParameter, param); err == nil && param != nil {
-				field.AnalyzerParameter = SingleWordAnalyzerParameter {
-					CaseSensitive:	proto.Bool(*param.CaseSensitive),
-					DelimitWord:	proto.Bool(*param.DelimitWord),
+				p := SingleWordAnalyzerParameter {}
+				if param.CaseSensitive != nil {
+					p.CaseSensitive = proto.Bool(*param.CaseSensitive)
 				}
+				if param.DelimitWord != nil {
+					p.DelimitWord = proto.Bool(*param.DelimitWord)
+				}
+				field.AnalyzerParameter = p
 			}
 		} else if field.Analyzer != nil && *field.Analyzer == Analyzer_Split && value.AnalyzerParameter != nil {
 			param := new(otsprotocol.SplitAnalyzerParameter)
 			if err := proto.Unmarshal(value.AnalyzerParameter, param); err == nil && param != nil {
-				field.AnalyzerParameter = SplitAnalyzerParameter {
-					Delimiter:	proto.String(*param.Delimiter),
+				p := SplitAnalyzerParameter {}
+				if param.Delimiter != nil {
+					p.Delimiter = proto.String(*param.Delimiter)
 				}
+				field.AnalyzerParameter = p
 			}
 		} else if field.Analyzer != nil && *field.Analyzer == Analyzer_Fuzzy && value.AnalyzerParameter != nil {
 			param := new(otsprotocol.FuzzyAnalyzerParameter)
 			if err := proto.Unmarshal(value.AnalyzerParameter, param); err == nil && param != nil {
-				field.AnalyzerParameter = FuzzyAnalyzerParameter {
-					MinChars:	proto.Int32(*param.MinChars),
-					MaxChars:	proto.Int32(*param.MaxChars),
+				p := FuzzyAnalyzerParameter {}
+				if param.MinChars != nil {
+					p.MinChars = proto.Int32(*param.MinChars)
 				}
+				if param.MaxChars != nil {
+					p.MaxChars = proto.Int32(*param.MaxChars)
+				}
+				field.AnalyzerParameter = p
 			}
 		}
 		field.EnableSortAndAgg = value.DocValues
