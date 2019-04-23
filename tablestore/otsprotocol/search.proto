@@ -263,7 +263,7 @@ message FieldSchema {
     optional IndexOptions index_options = 3;
     optional string analyzer = 4;
     optional bool index = 5;
-    optional bool doc_values = 6;
+    optional bool sort_and_agg = 6;
     optional bool store = 7;
     repeated FieldSchema field_schemas = 8; // only for nested type
     optional bool is_array = 9;

@@ -142,7 +142,7 @@ func convertFieldSchemaToPBFieldSchema(fieldSchemas []*FieldSchema) []*otsprotoc
 			}
 		}
 		if value.EnableSortAndAgg != nil {
-			field.DocValues = proto.Bool(*value.EnableSortAndAgg)
+			field.SortAndAgg = proto.Bool(*value.EnableSortAndAgg)
 		}
 		if value.Store != nil {
 			field.Store = proto.Bool(*value.Store)
@@ -231,7 +231,7 @@ func parseFieldSchemaFromPb(pbFieldSchemas []*otsprotocol.FieldSchema) []*FieldS
 				field.AnalyzerParameter = p
 			}
 		}
-		field.EnableSortAndAgg = value.DocValues
+		field.EnableSortAndAgg = value.SortAndAgg
 		field.Store = value.Store
 		field.IsArray = value.IsArray
 		if field.FieldType == FieldType_NESTED {
